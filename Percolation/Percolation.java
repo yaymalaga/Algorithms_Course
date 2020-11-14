@@ -2,12 +2,12 @@ import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    final private WeightedQuickUnionUF model;
-    final int[][] matrix;
+    private final WeightedQuickUnionUF model;
+    private boolean[][] matrix;
     private int openedCounter;
-    final private int gridSize;
-    final private int virtualTopNode;
-    final private int virtualBottomNode;
+    private final int gridSize;
+    private final int virtualTopNode;
+    private final int virtualBottomNode;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -18,63 +18,63 @@ public class Percolation {
         // NxN grid + 2 virtual nodes (top and bottom)
         model = new WeightedQuickUnionUF((n * n) + 2);
 
-        matrix = new int[n][n];
+        matrix = new boolean[n][n];
         openedCounter = 0;
         gridSize = n;
-        
-        virtualTopNode = gridSize*gridSize;
-        virtualBottomNode = (gridSize*gridSize) + 1;
+
+        virtualTopNode = gridSize * gridSize;
+        virtualBottomNode = virtualTopNode + 1;
     }
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        final int model_row = processInput(row);
-        final int model_col = processInput(col);
+        final int modelRow = processInput(row);
+        final int modelCol = processInput(col);
+
+        if (isOpen(row, col))
+            return;
 
         // Set open
-        matrix[model_row][model_col] = 1;
+        matrix[modelRow][modelCol] = true;
         openedCounter = openedCounter + 1;
 
-        final int node = transformRowCol(model_row, model_col);
+        final int node = transformRowCol(modelRow, modelCol);
 
-        // Connect to top virtual node 
-        if (model_row == 0) {
+        // Connect to top virtual node
+        if (modelRow == 0) {
             model.union(node, virtualTopNode);
+        }
+
         // Connect to bottom virtual node
-        } else if (model_row == gridSize - 1) {
+        if (modelRow == gridSize - 1) {
             model.union(node, virtualBottomNode);
         }
 
         // Neighbor connections
-        connectIfPossible(row-1, col, node);
-        connectIfPossible(row+1, col, node);
-        connectIfPossible(row, col-1, node);
-        connectIfPossible(row, col+1, node);
+        connectIfPossible(row - 1, col, node);
+        connectIfPossible(row + 1, col, node);
+        connectIfPossible(row, col - 1, node);
+        connectIfPossible(row, col + 1, node);
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        final int model_row = processInput(row);
-        final int model_col = processInput(col);
+        final int modelRow = processInput(row);
+        final int modelCol = processInput(col);
 
-        return matrix[model_row][model_col] == 1;
+        return matrix[modelRow][modelCol];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        if (row < 1 || col < 1) {
+        if (row < 1 || col < 1 || row > gridSize || col > gridSize) {
             throw new IllegalArgumentException();
         }
 
-        if (!isOpen(row, col)) return false;
+        if (!isOpen(row, col))
+            return false;
 
-        boolean full = false;
-        if (isOpen(row, col)) full = true;
-        if (isOpen(row, col)) full = true;
-        if (isOpen(row, col)) full = true;
-        if (isOpen(row, col)) full = true;
-
-        return full;
+        return model.find(virtualTopNode) == model.find(transformRowCol(row - 1, col - 1));
     }
 
     // returns the number of open sites
@@ -89,22 +89,23 @@ public class Percolation {
     }
 
     private boolean isValidPos(int row, int col) {
-        return (row > 0 && col > 0 && row <= gridSize && col <= gridSize); 
+        return (row > 0 && col > 0 && row <= gridSize && col <= gridSize);
     }
 
     private void connectIfPossible(int row, int col, int node) {
-        if (!isValidPos(row, col) || !isOpen(row, col)) return;
+        if (!isValidPos(row, col) || !isOpen(row, col))
+            return;
 
-        final int model_row = processInput(row);
-        final int model_col = processInput(col);
+        final int modelRow = processInput(row);
+        final int modelCol = processInput(col);
 
-        int neighborNode = transformRowCol(model_row, model_col);
-            
+        int neighborNode = transformRowCol(modelRow, modelCol);
+
         model.union(neighborNode, node);
     }
 
     private int processInput(int value) {
-        if (value < 1) {
+        if (value < 1 || value > gridSize) {
             throw new IllegalArgumentException();
         }
 
@@ -130,7 +131,7 @@ public class Percolation {
             }
         }
 
-        final double threshold = percolationSystem.numberOfOpenSites() / Double.valueOf(modelSize * modelSize);
+        final double threshold = percolationSystem.numberOfOpenSites() / (double) (modelSize * modelSize);
         System.out.println(threshold);
     }
 }
