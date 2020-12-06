@@ -2,9 +2,9 @@ import java.util.Iterator;
 
 public class Deque<Item> implements Iterable<Item> {
     // Node object
-    public Node firstNode;
+    private Node firstNode;
     // Reference to last node object
-    public Node lastNode;
+    private Node lastNode;
     // Number of objects;
     private int size;
 
@@ -106,7 +106,6 @@ public class Deque<Item> implements Iterable<Item> {
             throw new java.util.NoSuchElementException();
         }
 
-
         if (size == 1) {
             return removeFirst();
         } else {
@@ -166,7 +165,7 @@ public class Deque<Item> implements Iterable<Item> {
         deque.addFirst(5);
         System.out.println("AddFirst 5");
         deque.printPointers();
-        
+
         deque.addFirst(8);
         System.out.println("AddFirst 8");
         deque.printPointers();

@@ -12,18 +12,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         size = 0;
     }
 
-    public RandomizedQueue(int initSize) {
-        items = (Item[]) new Object[initSize];
-        size = 0;
-	}
-
     // is the randomized queue empty?
-    public boolean isEmpty() { 
-        return size == 0; 
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     // return the number of items on the randomized queue
-    public int size() { 
+    public int size() {
         return size;
     }
 
@@ -51,13 +46,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         randomizeQueue();
 
         // Return last item from the randomized queue
-        final Item item = items[size-1];
-        items[size-1] = null;
+        final Item item = items[size - 1];
+        items[size - 1] = null;
 
         size--;
 
         // Resize half size if just using a quarter
-        if (size == items.length / 4) {
+        if (size > 0 && size == items.length / 4) {
             resize(items.length / 2);
         }
 
@@ -82,9 +77,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
 
         randomizeQueue();
-        
+
         // Return last item from the randomized queue
-        return items[size-1];
+        return items[size - 1];
     }
 
     private void randomizeQueue() {
@@ -93,8 +88,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
         // Swap item at random index with the last item
         final Item randomItem = items[randomIndex];
-        items[randomIndex] = items[size-1];
-        items[size-1] = randomItem;
+        items[randomIndex] = items[size - 1];
+        items[size - 1] = randomItem;
     }
 
     // return an independent iterator over items in random order
@@ -104,6 +99,19 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private class ListIterator implements Iterator<Item> {
         private int counter = 0;
+        private final Item[] iterItems;
+
+        public ListIterator() {
+            final Item[] newItems = (Item[]) new Object[size];
+
+            for (int i = 0; i < size; i++) {
+                newItems[i] = items[i];
+            }
+
+            StdRandom.shuffle(newItems);
+
+            iterItems = newItems;
+        }
 
         public boolean hasNext() {
             return counter != size;
@@ -114,8 +122,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
                 throw new java.util.NoSuchElementException();
             }
 
+            final Item item = iterItems[counter];
             counter++;
-            return sample();
+
+            return item;
         }
 
         public void remove() {
@@ -126,7 +136,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     // unit testing (required)
     public static void main(String[] args) {
         final RandomizedQueue<Integer> randomQueue = new RandomizedQueue<Integer>();
-        
+
         System.out.println(randomQueue.isEmpty());
         System.out.println(randomQueue.size());
         System.out.println("");
@@ -156,10 +166,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         System.out.println(randomQueue.isEmpty());
         System.out.println(randomQueue.size());
         System.out.println("");
-        
+
         for (Integer item : randomQueue) {
             System.out.println(item);
-            item = null;
         }
     }
 

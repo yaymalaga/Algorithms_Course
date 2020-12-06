@@ -7,14 +7,10 @@ public class Permutation {
         }
 
         final int nItems = Integer.parseInt(args[0]);
-        final RandomizedQueue<String> randomQueue = new RandomizedQueue<String>(nItems);
-        
-        while (true) {
-            try {
-                randomQueue.enqueue(StdIn.readString());
-            } catch (java.util.NoSuchElementException e) {
-                break;
-            }
+        final RandomizedQueue<String> randomQueue = new RandomizedQueue<String>();
+
+        while (!StdIn.isEmpty()) {
+            randomQueue.enqueue(StdIn.readString());
         }
 
         for (int i = 0; i < nItems; i++) {
